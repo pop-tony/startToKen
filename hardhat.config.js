@@ -31,8 +31,8 @@ module.exports = {
       chainId: 1337
     },
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/zRD--7MbpPy6ooBiZqk-g",
-      accounts: [ "17b6ebc4c80849d6bc866c2124ec71613a9a6437e79665e6718a3fa45c5bf6e7"  ],
+      url: "",
+      accounts: [ ""  ],
     },
   },
   solidity: {

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../pinata";
-import Marketplace from '../FractionalMarket.json"';
+import FractionalMarket from '../FractionalMarket.json';
 
 export default function SellNFT () {
     const [formParams, updateFormParams] = useState({ name: '', description: '', price: '', totalSupply: '', dontApproveSell: false});
@@ -69,7 +69,7 @@ export default function SellNFT () {
 
             updateMessage("Please wait..... uploading(upto 5 mins)");
 
-            let contract = new ethers.Contract(Marketplace.address, Marketplace.abi, signer);
+            let contract = new ethers.Contract(FractionalMarket.address, FractionalMarket.abi, signer);
 
             const price = ethers.utils.parseUnits(formParams.price, 'ether');
             const { dontApproveSell } = formParams;
@@ -77,7 +77,7 @@ export default function SellNFT () {
             let listingPrice = await contract.getListPrice();
             listingPrice = listingPrice.toString();
 
-            let transaction = await contract.createToken(metaDataURL, price, totalSupply, {value: listingPrice});
+            let transaction = await contract.createToken(metaDataURL, totalSupply, price, {value: listingPrice});
             await transaction.wait();
             
             alert("NFT sucessfully listed");
@@ -87,7 +87,7 @@ export default function SellNFT () {
         }catch(error){
             alert("Upload unsucessful; There was an issue, please try again");
             updateMessage("");
-            console.log(error);
+            console.error(error);
         }
     }
 

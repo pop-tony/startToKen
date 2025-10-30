@@ -55,12 +55,12 @@ contract FractionalToken is ERC1155, ERC1155Holder{
 
     event TokenListed(uint256 tokenId);
 
-    constructor() ERC1155("FractionalMarket") {
+    constructor() ERC1155("FractionalTokenMarket") {
         owner = payable (msg.sender);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC1155, ERC1155Holder) returns (bool) {
-        return ERC1155.supportsInterface(interfaceId) || ERC1155Holder.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view override(ERC1155, ERC1155Receiver) returns (bool) {
+        return ERC1155.supportsInterface(interfaceId) || ERC1155Receiver.supportsInterface(interfaceId);
     }
 
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal {
@@ -94,6 +94,162 @@ contract FractionalToken is ERC1155, ERC1155Holder{
 
     function getHoldersWithBalances(uint256 _id) public view returns (tokenHolders[] memory){
         return holdersWithBalances[_id];
+    }
+
+    function holdersWithBalUpdate(uint256 _tokenId, uint256 _supply) internal{
+        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
+            if (holdersWithBalances[_tokenId][i].holder == msg.sender) {
+                holdersWithBalances[_tokenId][i].holding -= _supply;
+               if(holdersWithBalances[_tokenId][i].holding == 0){
+                    // Remove holder from tokensCreated[_tokenId].holders
+                    uint256 holderIndex;
+                    for (uint256 j = 0; j < tokensCreated[_tokenId].holders.length; j++) {
+                        if (tokensCreated[_tokenId].holders[j] == holdersWithBalances[_tokenId][i].holder) {
+                            holderIndex = j;
+                            break;
+                        }
+                    }
+                    tokensCreated[_tokenId].holders[holderIndex] = tokensCreated[_tokenId].holders[tokensCreated[_tokenId].holders.length - 1];
+                    tokensCreated[_tokenId].holders.pop();
+
+                    // Remove holder from holdersWithBalances
+                    holdersWithBalances[_tokenId][i] = holdersWithBalances[_tokenId][holdersWithBalances[_tokenId].length - 1];
+                    holdersWithBalances[_tokenId].pop();
+                }
+                break;
+            }
+        }
+    }
+
+    function updateBringMapp(uint256 _tokenId, uint256 _supply) internal{
+        // Update tokensOf for msg.sender
+        for (uint i = 0; i < tokensOf[msg.sender].length; i++) {
+            if (tokensOf[msg.sender][i].token_id == _tokenId) {
+                tokensOf[msg.sender][i].balance -= _supply;
+                break;
+            }
+        }
+
+        // Update tokensOf for _to
+        bool tokenExists = false;
+        for (uint i = 0; i < tokensOf[address(this)].length; i++) {
+            if (tokensOf[address(this)][i].token_id == _tokenId) {
+                tokensOf[address(this)][i].balance += _supply;
+                tokenExists = true;
+                break;
+            }
+        }
+
+        if (tokenExists == false) {
+            tokensOf[address(this)].push(tokens(
+                _tokenId,
+                tokensCreated[_tokenId].creator,
+                tokensCreated[_tokenId].price,
+                _supply,
+                tokensCreated[_tokenId].total_supply,
+                new address[](0)
+            ));
+        }
+
+        // Update holdersWithBalances
+        holdersWithBalUpdate(_tokenId, _supply);
+
+        bool holderExists = false;
+        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
+            if (holdersWithBalances[_tokenId][i].holder == address(this)) {
+                holdersWithBalances[_tokenId][i].holding += _supply;
+                holderExists = true;
+                break;
+            }
+        }
+
+        if (holderExists == false) {
+            holdersWithBalances[_tokenId].push(tokenHolders(
+                address(this),
+                _supply
+            ));
+        }
+
+        // Update holders array
+        bool holderAddressExists = false;
+        for (uint i = 0; i < tokensCreated[_tokenId].holders.length; i++) {
+            if (tokensCreated[_tokenId].holders[i] == address(this)) {
+                holderAddressExists = true;
+                break;
+            }
+        }
+
+        if (holderAddressExists == false) {
+            tokensCreated[_tokenId].holders.push(address(this));
+        }
+    }
+
+    function updateSaleMapps(uint256 _tokenId, uint256 _amount) internal{
+        // Update tokensOf for msg.sender
+        for (uint i = 0; i < tokensOf[address(this)].length; i++) {
+            if (tokensOf[address(this)][i].token_id == _tokenId) {
+                tokensOf[address(this)][i].balance -= _amount;
+                break;
+            }
+        }
+
+        // Update tokensOf for _to
+        bool tokenExists = false;
+        for (uint i = 0; i < tokensOf[msg.sender].length; i++) {
+            if (tokensOf[msg.sender][i].token_id == _tokenId) {
+                tokensOf[msg.sender][i].balance += _amount;
+                tokenExists = true;
+                break;
+            }
+        }
+
+        if (tokenExists == false) {
+            tokensOf[msg.sender].push(tokens(
+                _tokenId,
+                tokensCreated[_tokenId].creator,
+                tokensCreated[_tokenId].price,
+                _amount,
+                tokensCreated[_tokenId].total_supply,
+                new address[](0)
+            ));
+        }
+
+        // Update holdersWithBalances
+        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
+            if (holdersWithBalances[_tokenId][i].holder == address(this)) {
+                holdersWithBalances[_tokenId][i].holding -= _amount;
+                break;
+            }
+        }
+
+        bool holderExists = false;
+        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
+            if (holdersWithBalances[_tokenId][i].holder == msg.sender) {
+                holdersWithBalances[_tokenId][i].holding += _amount;
+                holderExists = true;
+                break;
+            }
+        }
+
+        if (holderExists == false) {
+            holdersWithBalances[_tokenId].push(tokenHolders(
+                msg.sender,
+                _amount
+            ));
+        }
+
+        // Update holders array
+        bool holderAddressExists = false;
+        for (uint i = 0; i < tokensCreated[_tokenId].holders.length; i++) {
+            if (tokensCreated[_tokenId].holders[i] == msg.sender) {
+                holderAddressExists = true;
+                break;
+            }
+        }
+
+        if (holderAddressExists == false) {
+            tokensCreated[_tokenId].holders.push(msg.sender);
+        }
     }
 
     // Function to create a new fractional token
@@ -181,12 +337,7 @@ contract FractionalToken is ERC1155, ERC1155Holder{
         }
 
         // Update holdersWithBalances
-        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
-            if (holdersWithBalances[_tokenId][i].holder == msg.sender) {
-                holdersWithBalances[_tokenId][i].holding -= _amount;
-                break;
-            }
-        }
+        holdersWithBalUpdate(_tokenId, _amount);
 
         bool holderExists = false;
         for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
@@ -245,71 +396,7 @@ contract FractionalToken is ERC1155, ERC1155Holder{
         payable(owner).transfer(msg.value);
 
         // update the token's status
-        // Update tokensOf for msg.sender
-        for (uint i = 0; i < tokensOf[address(this)].length; i++) {
-            if (tokensOf[address(this)][i].token_id == _tokenId) {
-                tokensOf[address(this)][i].balance -= _amount;
-                break;
-            }
-        }
-
-        // Update tokensOf for _to
-        bool tokenExists = false;
-        for (uint i = 0; i < tokensOf[msg.sender].length; i++) {
-            if (tokensOf[msg.sender][i].token_id == _tokenId) {
-                tokensOf[msg.sender][i].balance += _amount;
-                tokenExists = true;
-                break;
-            }
-        }
-
-        if (tokenExists == false) {
-            tokensOf[msg.sender].push(tokens(
-                _tokenId,
-                tokensCreated[_tokenId].creator,
-                tokensCreated[_tokenId].price,
-                _amount,
-                tokensCreated[_tokenId].total_supply,
-                new address[](0)
-            ));
-        }
-
-        // Update holdersWithBalances
-        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
-            if (holdersWithBalances[_tokenId][i].holder == address(this)) {
-                holdersWithBalances[_tokenId][i].holding -= _amount;
-                break;
-            }
-        }
-
-        bool holderExists = false;
-        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
-            if (holdersWithBalances[_tokenId][i].holder == msg.sender) {
-                holdersWithBalances[_tokenId][i].holding += _amount;
-                holderExists = true;
-                break;
-            }
-        }
-
-        if (holderExists == false) {
-            holdersWithBalances[_tokenId].push(tokenHolders(
-                msg.sender,
-                _amount
-            ));
-        }
-
-        // Update holders array
-        bool holderAddressExists = false;
-        for (uint i = 0; i < tokensCreated[_tokenId].holders.length; i++) {
-            if (tokensCreated[_tokenId].holders[i] == msg.sender) {
-                holderAddressExists = true;
-                break;
-            }
-        }
-
-        if (holderAddressExists == false) {
-            tokensCreated[_tokenId].holders.push(msg.sender);
-        }
+        updateSaleMapps(_tokenId, _amount);
     }
 
     function bringToMarket(uint256 _tokenId, uint256 _supply) public payable {
@@ -318,71 +405,7 @@ contract FractionalToken is ERC1155, ERC1155Holder{
         safeTransferFrom(msg.sender, address(this), _tokenId, _supply, "");
 
         // update the token's status
-        // Update tokensOf for msg.sender
-        for (uint i = 0; i < tokensOf[msg.sender].length; i++) {
-            if (tokensOf[msg.sender][i].token_id == _tokenId) {
-                tokensOf[msg.sender][i].balance -= _supply;
-                break;
-            }
-        }
-
-        // Update tokensOf for _to
-        bool tokenExists = false;
-        for (uint i = 0; i < tokensOf[address(this)].length; i++) {
-            if (tokensOf[address(this)][i].token_id == _tokenId) {
-                tokensOf[address(this)][i].balance += _supply;
-                tokenExists = true;
-                break;
-            }
-        }
-
-        if (tokenExists == false) {
-            tokensOf[address(this)].push(tokens(
-                _tokenId,
-                tokensCreated[_tokenId].creator,
-                tokensCreated[_tokenId].price,
-                _supply,
-                tokensCreated[_tokenId].total_supply,
-                new address[](0)
-            ));
-        }
-
-        // Update holdersWithBalances
-        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
-            if (holdersWithBalances[_tokenId][i].holder == msg.sender) {
-                holdersWithBalances[_tokenId][i].holding -= _supply;
-                break;
-            }
-        }
-
-        bool holderExists = false;
-        for (uint i = 0; i < holdersWithBalances[_tokenId].length; i++) {
-            if (holdersWithBalances[_tokenId][i].holder == address(this)) {
-                holdersWithBalances[_tokenId][i].holding += _supply;
-                holderExists = true;
-                break;
-            }
-        }
-
-        if (holderExists == false) {
-            holdersWithBalances[_tokenId].push(tokenHolders(
-                address(this),
-                _supply
-            ));
-        }
-
-        // Update holders array
-        bool holderAddressExists = false;
-        for (uint i = 0; i < tokensCreated[_tokenId].holders.length; i++) {
-            if (tokensCreated[_tokenId].holders[i] == address(this)) {
-                holderAddressExists = true;
-                break;
-            }
-        }
-
-        if (holderAddressExists == false) {
-            tokensCreated[_tokenId].holders.push(address(this));
-        }
+        updateBringMapp(_tokenId, _supply);
 
         // emit an event
         emit TokenListed(_tokenId);

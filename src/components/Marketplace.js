@@ -1,11 +1,11 @@
+import { useContext } from 'react';
+import { AppContent } from '../contex/TokenContext';
 
 import NFTTile from "./NFTTile";
-import MarketplaceJSON from "../FractionalMarket.json";
-import axios from "axios";
-import { useState } from "react";
-import { GetIpfsUrlFromPinata } from "../utils";
 
 export default function Marketplace() {
+
+    const {data} = useContext(AppContent);
     const sampleData = [
         {
             "name": "NFT#1",
@@ -35,54 +35,6 @@ export default function Marketplace() {
             "address":"0xe81Bf5A757C4f7F82a2F23b1e59bE45c33c5b13",
         },
     ];
-    const [data, updateData] = useState(sampleData);
-    const [dataFetched, updateFetched] = useState(false);
-
-    async function getAllNFTs() {
-        try {
-          const ethers = require("ethers");
-            //After adding your Hardhat network to your metamask, this code will get providers and signers
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            //Pull the deployed contract instance
-            let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
-            //create an NFT Token
-            let transaction = await contract.getAllNFTs()
-        
-            //Fetch all the details of every NFT from the contract and display
-            const items = await Promise.all(transaction.map(async i => {
-                var tokenURI = await contract.tokenURI(i.tokenId);
-                console.log("getting this tokenUri", tokenURI);
-                tokenURI = GetIpfsUrlFromPinata(tokenURI);
-                let meta = await axios.get(tokenURI);
-                meta = meta.data;
-        
-                let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
-                let item = {
-                    price,
-                    tokenId: tokenId,
-                    creator: listedToken.creator,
-                    holders: listedToken.holders,
-                    totalSupply: listedToken.totalSupply,
-                    balance: listedToken.balance,
-                    image: meta.image,
-                    name: meta.name,
-                    description: meta.description,
-                    onMarket: listedToken.currentlyListed
-                }
-                return item;
-            }))
-        
-            updateFetched(true);
-            updateData(items);  
-        } catch (error) {
-            console.error(error)
-            alert("There was an issue, please try again")
-        }
-    }
-    
-    if(!dataFetched)
-        getAllNFTs();
 
     return (
         <div>
@@ -91,9 +43,11 @@ export default function Marketplace() {
                     Top NFTs
                 </div>
                 <div className="flex mt-5 justify-between flex-wrap max-w-screen-xl text-center">
-                    {data.map((value, index) => {
-                        return <NFTTile data={value} key={index}></NFTTile>;
-                    })}
+                    {   data.length &&
+                        data.map((value, index) => {
+                            return <NFTTile data={value} key={index}></NFTTile>;
+                        })
+                    }
                 </div>
             </div>            
         </div>

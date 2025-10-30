@@ -1,25 +1,15 @@
 import logo from '../main_logo_ransparent.svg';
 
-import {
-  Link,
-} from "react-router-dom";
-import { useEffect, useState } from 'react';
+import {Link,} from "react-router-dom";
+import { useContext } from 'react';
 import { useLocation } from 'react-router';
+import { AppContent } from '../contex/TokenContext';
 
 function Navbar() {
 
-  const [connected, toggleConnect] = useState(false);
-  const location = useLocation();
-  const [currAddress, updateAddress] = useState('0x');
+  const {connected, currAddress} = useContext(AppContent);
 
-  async function getAddress() {
-    const ethers = require("ethers");
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const addr = await signer.getAddress();
-    updateAddress(addr);
-  }
-  
+  const location = useLocation();
   
   async function connectWebsite() {
 
@@ -47,38 +37,6 @@ function Navbar() {
     }
   
   }
-  
-  useEffect(() => {
-
-    try {
-      
-      const func = async ()=>{
-        const chk = await window.ethereum;
-        if(chk === undefined){
-          return;
-        }
-
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        const chk1 = accounts.length > 0;
-
-        if(chk1){
-          toggleConnect(true);
-          getAddress();
-          window.ethereum.on('accountsChanged', function(accounts){
-            window.location.replace(location.pathname)
-          })
-        }else{
-          toggleConnect(false);
-        }
-      }
-      func()
-      
-    } catch (error) {
-      console.log(error)
-      alert("There was an issue, please try again")
-    }
-    
-  },);
 
   return (
     <div className="">
