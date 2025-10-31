@@ -7,7 +7,7 @@ import { AppContent } from '../contex/TokenContext';
 
 export default function NFTPage (props) {
 
-    const {data, currAddress} = useContext(AppContent);
+    const {data, currAddress, dataId} = useContext(AppContent);
 
     const [message, updateMessage] = useState("");
     const [supply, setSupply] = useState(1);
@@ -71,13 +71,21 @@ export default function NFTPage (props) {
 
     useEffect(()=>{
         async function dataOne(){
-            setData1(data[0]);
+            let theOne;
+            for(let i = 0; i < data.length; i++){
+                if(data[i].tokenId.toString() === dataId.toString()){
+                    theOne = data[i];
+                    break;
+                }
+            }
+
+            setData1(theOne);
         }
 
         dataOne()
         console.log(data1);
         
-    },[data1, data])
+    },[data1, data, dataId])
 
     return(
         <div className="min-height-100vh">
@@ -105,9 +113,11 @@ export default function NFTPage (props) {
                             <div>
                                 {data1.creator &&
                                     !data1.holders.includes(currAddress) ?
-                                    <div>
+                                    <div className="text-emerald-700">
+                                        <p>You currently do not have any holdings</p>
+
                                         <form>
-                                            <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="totalSupply">Supply Market</label>
+                                            <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="totalSupply">Purchase Token</label>
                                             <input
                                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                 type="number"
@@ -155,9 +165,31 @@ export default function NFTPage (props) {
                                                         putOnmart(supply);
                                                     } }
                                                 >
-                                                    {data1.onMarket ? <p>token is in market add more ?</p> : <p>Put on market</p>}
+                                                    {data1.onMarket ? <p>token is in market add more ?</p> : <p>Supply</p>}
                                                 </button>
                                             </form>
+                                            <form>
+                                            <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="totalSupply">Purchase More</label>
+                                            <input
+                                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                type="number"
+                                                placeholder="Min 1"
+                                                min={1}
+                                                value={buy}
+                                                onChange={e => {
+                                                    const _buy = parseFloat(e.target.value);
+                                                    if (!isNaN(_buy) && _buy >= 1) {
+                                                        setBuy(e.target.value);
+                                                    }
+                                                } } />
+
+                                            <button className="enableEthereumButton bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={(e) => {
+                                                e.preventDefault();
+                                                buyNFT(tokenId, buy);
+                                            } }>
+                                                Buy this Token
+                                            </button>
+                                        </form>
                                         </div>
                                     </div>
                                 }

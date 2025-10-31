@@ -2,14 +2,18 @@ import { createContext, useState, useEffect, React } from "react";
 import axios from 'axios';
 import MarketplaceJSON from "../FractionalMarket.json";
 import { GetIpfsUrlFromPinata } from "../utils";
+import { useLocation } from 'react-router';
 
 export const AppContent = createContext()
 export const AppContextProvider = (props)=>{
+
+    const location = useLocation();
 
     const [data, updateData] = useState({});
     const [dataFetched, updateFetched] = useState(false);
     const [currAddress, updateAddress] = useState('0x');
     const [connected, toggleConnect] = useState(false);
+    const [dataId, setDataId] = useState(0);
 
     async function getAddress() {
         const ethers = require("ethers");
@@ -33,6 +37,7 @@ export const AppContextProvider = (props)=>{
             //Fetch all the details of every NFT from the contract and display
             const items = await Promise.all(transaction.map(async i => {
                 var tokenURI = await contract.uri(i.token_id);
+                let holdersWithBance = await contract.getHoldersWithBalances(i.token_id);
                 console.log("getting this tokenUri", tokenURI);
                 tokenURI = GetIpfsUrlFromPinata(tokenURI);
                 let meta = await axios.get(tokenURI);
@@ -42,6 +47,16 @@ export const AppContextProvider = (props)=>{
                 let totalSupply = i.total_supply.toString();
                 let balance = i.balance.toString();
                 let tokenId = i.token_id.toString();
+                let has;
+                for(let a = 0; a < holdersWithBance.length; a++){
+                    const hasAddr = await holdersWithBance.find((holder) => holder[0] === currAddress);
+                    if(hasAddr){
+                        if(hasAddr.length)
+                        has = hasAddr[1].toString();
+                        break
+                    }
+                    
+                }
                 
                 let item = {
                     price,
@@ -53,7 +68,9 @@ export const AppContextProvider = (props)=>{
                     image: meta.image,
                     name: meta.name,
                     description: meta.description,
-                    onMarket: i.currentlyListed
+                    onMarket: i.currentlyListed,
+                    holdersWithBances: holdersWithBance,
+                    has
                 }
                 return item;
             }))
@@ -83,7 +100,7 @@ export const AppContextProvider = (props)=>{
                     toggleConnect(true);
                     getAddress();
                     window.ethereum.on('accountsChanged', function(accounts){
-                    
+                    window.location.replace(location.pathname)
                     })
                 }else{
                     toggleConnect(false);
@@ -115,6 +132,7 @@ export const AppContextProvider = (props)=>{
         dataFetched, updateFetched,
         currAddress, updateAddress, getAddress,
         connected, toggleConnect,
+        dataId, setDataId,
     }
 
     return (

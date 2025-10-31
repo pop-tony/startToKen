@@ -3,17 +3,27 @@ import {
     Link,
   } from "react-router-dom";
 import { GetIpfsUrlFromPinata } from "../utils";
+import { useContext } from "react";
+import { AppContent } from "../contex/TokenContext";
 
-function NFTTile (data) {
+function NFTTile (data, key) {
+
+    const {setDataId} = useContext(AppContent)
+
     const newTo = {
         pathname:"/nftPage/"+data.data.tokenId
     }
 
     const IPFSUrl = GetIpfsUrlFromPinata(data.data.image);
 
+    function setSetDataId(_id){
+        setDataId(_id)
+    }
+
     return (
         <Link to={newTo}>
-        <div className="border-2 ml-12 mt-5 mb-12 flex flex-col items-center rounded-lg w-48 md:w-72 shadow-2xl">
+        <div className="border-2 ml-12 mt-5 mb-12 flex flex-col items-center rounded-lg w-48 md:w-72 shadow-2xl"
+        onClick={()=>setSetDataId(data.data.tokenId)}>
             <img src={IPFSUrl} alt="" className="w-72 h-80 rounded-lg object-cover" />
             <div className= "text-white w-full p-2 bg-gradient-to-t from-[#454545] to-transparent rounded-lg pt-5 -mt-20">
                 <strong className="text-xl">{data.data.name}</strong>
