@@ -55,7 +55,7 @@ contract FractionalToken is ERC1155, ERC1155Holder{
 
     event TokenListed(uint256 tokenId);
 
-    constructor() ERC1155("FractionalTokenMarket") {
+    constructor() ERC1155("FractionalToken") {
         owner = payable (msg.sender);
     }
 
@@ -256,7 +256,7 @@ contract FractionalToken is ERC1155, ERC1155Holder{
     function createToken(string memory tokenURI, uint256 _totalSupply, uint256 _price) public payable returns(uint256){
         require(_totalSupply > 0, "Total supply must be greater than 0");
         require(msg.value == listPrice, "Send the correct price");
-        require(_price >= 10000000000000000, "Price should be more than 0.009 eth");
+        require(_price > 0.009 ether, string(abi.encodePacked("Price should be more than 0.009 eth, you sent:  ", Strings.toString(_price))));
 
         uint256 _tokenId = tokenID.current();
         address[] memory _holders = new address[](1);

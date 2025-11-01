@@ -77,6 +77,7 @@ export const AppContextProvider = (props)=>{
         
             updateData(items);  
             updateFetched(true);
+            
         } catch (error) {
             console.error(error)
             alert("There was an issue, please try again")

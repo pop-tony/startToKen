@@ -58,7 +58,7 @@ export default function Profile () {
             <div className="flex flex-row text-center justify-center mt-10 md:text-2xl text-white">
                     <div>
                         <h2 className="font-bold">No. of NFTs</h2>
-                        {data.length}
+                        {data1.length}
                     </div>
                     <div className="ml-20">
                         <h2 className="font-bold">Total Value</h2>
@@ -73,7 +73,7 @@ export default function Profile () {
                     })}
                 </div>
                 <div className="mt-10 text-xl">
-                    {data.length === 0 ? "Oops, No NFT data to display (Log in and make some purchase!)":""}
+                    {data1.length === 0 ? "Oops, No NFT data to display (Log in and make some purchase!)":""}
                 </div>
             </div>
             </div>

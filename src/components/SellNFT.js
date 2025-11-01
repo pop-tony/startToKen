@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../pinata";
 import FractionalMarket from '../FractionalMarket.json';
+//import { AppContent } from "../contex/TokenContext";
 
 export default function SellNFT () {
     const [formParams, updateFormParams] = useState({ name: '', description: '', price: '', totalSupply: '', dontApproveSell: false});
@@ -9,6 +10,7 @@ export default function SellNFT () {
     const [file, setFile] = useState(null);
     const ethers = require("ethers");
     const [message, updateMessage] = useState('');
+    //const {listingPrice} = useContext(AppContent);
 
     function UploadFileDone(){
         if(!fileURL){
@@ -69,7 +71,7 @@ export default function SellNFT () {
 
             updateMessage("Please wait..... uploading(upto 5 mins)");
 
-            let contract = new ethers.Contract(FractionalMarket.address, FractionalMarket.abi, signer);
+            const contract = new ethers.Contract(FractionalMarket.address, FractionalMarket.abi, signer);
 
             const price = ethers.utils.parseUnits(formParams.price, 'ether');
             const { dontApproveSell } = formParams;

@@ -5,7 +5,7 @@ const fs = require("fs");
 async function main() {
   const [deployer] = await ethers.getSigners();
   const balance = await deployer.getBalance();
-  const Marketplace = await hre.ethers.getContractFactory("FractionalMarket");
+  const Marketplace = await hre.ethers.getContractFactory("FractionalToken");
   const marketplace = await Marketplace.deploy();
 
   await marketplace.deployed();
