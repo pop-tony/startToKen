@@ -4,6 +4,8 @@ import MarketplaceJSON from "../FractionalMarket.json";
 import { useState } from "react";
 import { useContext, useEffect } from 'react';
 import { AppContent } from '../contex/TokenContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function NFTPage (props) {
 
@@ -34,11 +36,11 @@ export default function NFTPage (props) {
             let transaction = await contract.executeSale(_tokenId, _buy, {value:salePriceInWei, gasLimit: 2000000});
             await transaction.wait();
 
-            alert('You successfully bought the NFT!');
+            toast.success('You successfully bought the NFT!');
             updateMessage("");
         }
         catch(e) {
-            alert("There was an issue, please try again")
+            toast.error("There was an issue, please try again")
             console.error("Upload Error"+e)
         }
     }
@@ -63,7 +65,7 @@ export default function NFTPage (props) {
             const data = await contract.bringToMarket(tokenId, _supply);
             await data.wait();
             console.log("Token put on market successfully");
-            alert("Token put on market successfully")
+            toast.success("Token put on market successfully")
         } catch (error) {
             console.log(error)
         }
@@ -89,7 +91,7 @@ export default function NFTPage (props) {
 
     return(
         <div className="min-height-100vh">
-            
+            <ToastContainer />
             <div className="flex ml-20 mt-20">
                 {   data1 &&
 

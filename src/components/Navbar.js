@@ -1,5 +1,6 @@
 import logo from '../main_logo_ransparent.svg';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {Link,} from "react-router-dom";
 import { useContext } from 'react';
 import { useLocation } from 'react-router';
@@ -33,20 +34,21 @@ function Navbar() {
       
     } catch (error) {
       console.log(error)
-      alert("There was an issue, please try again")
+      toast.error("There was an issue, make sure youre loggedin")
     }
   
   }
 
   return (
     <div className="">
+      <ToastContainer />
       <nav className="w-screen">
         <ul className='flex items-end justify-between py-3 bg-transparent text-white pr-5'>
         <li className='flex items-end ml-5 pb-2'>
           <Link to="/">
           <img src={logo} alt="logo" width={120} height={120} className="inline-block -mt-2"/>
           <div className='inline-block font-bold text-xl ml-2'>
-            NFT Marketplace
+            RFT Marketplace
           </div>
           </Link>
         </li>
@@ -63,11 +65,11 @@ function Navbar() {
             }
             {location.pathname === "/sellNFT" ? 
             <li className='border-b-2 hover:pb-0 p-2'>
-              <Link to="/sellNFT">List My NFT</Link>
+              <Link to="/sellNFT">List My RFT</Link>
             </li>
             :
             <li className='hover:border-b-2 hover:pb-0 p-2'>
-              <Link to="/sellNFT">List My NFT</Link>
+              <Link to="/sellNFT">List My RFT</Link>
             </li>              
             }              
             {location.pathname === "/profile" ? 

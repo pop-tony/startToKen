@@ -3,6 +3,8 @@ import axios from 'axios';
 import MarketplaceJSON from "../FractionalMarket.json";
 import { GetIpfsUrlFromPinata } from "../utils";
 import { useLocation } from 'react-router';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const AppContent = createContext()
 export const AppContextProvider = (props)=>{
@@ -15,15 +17,29 @@ export const AppContextProvider = (props)=>{
     const [connected, toggleConnect] = useState(false);
     const [dataId, setDataId] = useState(0);
 
+    getAddress();
+
     async function getAddress() {
-        const ethers = require("ethers");
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const addr = await signer.getAddress();
-        updateAddress(addr);
+        try{
+            const ethers = require("ethers");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const addr = await signer.getAddress();
+            if(addr){
+                updateAddress(addr);
+            }else{
+                console.log('no add')
+                toast.error("Issue with connecting... connect metamask again")
+            }
+        }catch(error){
+            console.log(error)
+            toast.error("Issue with connecting... connect metamask")
+        }
+        
     }
 
     async function getAllNFTs() {
+
         try {
           const ethers = require("ethers");
             //After adding your Hardhat network to your metamask, this code will get providers and signers
@@ -35,52 +51,42 @@ export const AppContextProvider = (props)=>{
             let transaction = await contract.getAllTokens()
         
             //Fetch all the details of every NFT from the contract and display
-            const items = await Promise.all(transaction.map(async i => {
-                var tokenURI = await contract.uri(i.token_id);
-                let holdersWithBance = await contract.getHoldersWithBalances(i.token_id);
-                console.log("getting this tokenUri", tokenURI);
-                tokenURI = GetIpfsUrlFromPinata(tokenURI);
-                let meta = await axios.get(tokenURI);
-                meta = meta.data;
-        
-                let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
-                let totalSupply = i.total_supply.toString();
-                let balance = i.balance.toString();
-                let tokenId = i.token_id.toString();
-                let has;
-                for(let a = 0; a < holdersWithBance.length; a++){
-                    const hasAddr = await holdersWithBance.find((holder) => holder[0] === currAddress);
-                    if(hasAddr){
-                        if(hasAddr.length)
-                        has = hasAddr[1].toString();
-                        break
-                    }
-                    
-                }
-                
-                let item = {
-                    price,
-                    tokenId,
-                    creator: i.creator,
-                    holders: i.holders,
-                    totalSupply,
-                    balance,
-                    image: meta.image,
-                    name: meta.name,
-                    description: meta.description,
-                    onMarket: i.currentlyListed,
-                    holdersWithBances: holdersWithBance,
-                    has
-                }
-                return item;
-            }))
+           const fetchItem = async (i) => {
+            try {
+                const tokenURI = GetIpfsUrlFromPinata(await contract.uri(i.token_id));
+                const meta = (await axios.get(tokenURI)).data;
+                const holdersWithBance = await contract.getHoldersWithBalances(i.token_id);
+                const hasAddr = holdersWithBance.find((_data) => _data.holder === currAddress);
+                const has = hasAddr ? hasAddr.holding.toString() : null;
+
+                return {
+                price: ethers.utils.formatUnits(i.price.toString(), 'ether'),
+                tokenId: i.token_id.toString(),
+                creator: i.creator,
+                holders: i.holders,
+                totalSupply: i.total_supply.toString(),
+                balance: i.balance.toString(),
+                image: meta.image,
+                name: meta.name,
+                description: meta.description,
+                onMarket: i.currentlyListed,
+                holdersWithBances: holdersWithBance,
+                has
+                };
+            } catch (error) {
+                console.error(`Error fetching item ${i.token_id}:`, error);
+                return null;
+            }
+            };
+
+            const items = await Promise.all(transaction.map(fetchItem));
         
             updateData(items);  
             updateFetched(true);
             
         } catch (error) {
             console.error(error)
-            alert("There was an issue, please try again")
+            toast.error("There was an issue getting tokens, are you loggedin?")
         }
     }
 
@@ -99,7 +105,7 @@ export const AppContextProvider = (props)=>{
         
                 if(chk1){
                     toggleConnect(true);
-                    getAddress();
+                    
                     window.ethereum.on('accountsChanged', function(accounts){
                     window.location.replace(location.pathname)
                     })
@@ -117,16 +123,17 @@ export const AppContextProvider = (props)=>{
                 await getAllNFTs();
             }
             exe();
+
             if(typeof data.image == "string"){
                 data.image = GetIpfsUrlFromPinata(data.image);
             }
             
         } catch (error) {
             console.log(error)
-            alert("There was an issue, please try again")
+            toast.error("There was an issue, make sure you are loggedin")
         }
         
-    })
+    },[currAddress, data])
 
     const value = {
         data, updateData,
