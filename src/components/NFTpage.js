@@ -96,7 +96,8 @@ export default function NFTPage (props) {
                 {   data1 &&
 
                     <>
-                        <img src={data1.image} alt="" className="w-2/5" /><div className="text-xl ml-20 space-y-8 text-white shadow-2xl rounded-lg border-2 p-5">
+                        <img src={data1.image} alt="" className="w-2/5 rounded-lg" />
+                        <div className="text-xl ml-20 space-y-8 text-white shadow-2xl rounded-lg border-2 p-5">
                             <div>
                                 Name: {data1.name}
                             </div>
@@ -111,6 +112,9 @@ export default function NFTPage (props) {
                             </div>
                             <div>
                                 Total Supply: <span className="text-sm">{data1.totalSupply}</span>
+                            </div>
+                            <div>
+                                Holding: <span className="text-sm">{data1.has}</span>
                             </div>
                             <div>
                                 {data1.creator &&
@@ -143,7 +147,7 @@ export default function NFTPage (props) {
                                     </div>
                                     :
                                     <div className="text-emerald-700">
-                                        <p>You are a holder of this NFT</p>
+                                        <p>You are a holder of this RFT</p>
                                         <div className="mb-6 mt-5">
                                             <form>
                                                 <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="totalSupply">Supply Market</label>
@@ -198,7 +202,7 @@ export default function NFTPage (props) {
 
                                 <div className="text-green text-center mt-3">{message}</div>
                             </div>
-                            </div>
+                        </div>
                     </>
                 }
                 

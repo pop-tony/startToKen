@@ -76,6 +76,11 @@ contract FractionalToken is ERC1155, ERC1155Holder{
         listPrice = _listPrice;
     }
 
+    function updateTokenPrice(uint256 _tokenId, uint256 _tokenPrice) public payable {
+        require(owner == msg.sender, "Only owner can update price");
+        tokensCreated[_tokenId].price = _tokenPrice;
+    }
+
     function getListPrice() public view returns (uint256) {
         return listPrice;
     }
