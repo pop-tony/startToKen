@@ -14,6 +14,7 @@ export default function NFTPage (props) {
     const [message, updateMessage] = useState("");
     const [supply, setSupply] = useState(1);
     const [buy, setBuy] = useState(1);
+    const [newPrice, setNewPrice] = useState(0);
     const [data1, setData1] = useState({})
 
     const params = useParams();
@@ -31,12 +32,12 @@ export default function NFTPage (props) {
             const salePrice = ((Number(data1.price) * buy) + (Number(data1.price) * 0.05))
             const salePriceInWei = ethers.utils.parseUnits(salePrice.toString(), 'ether')
             console.log(salePriceInWei.toString())
-            updateMessage("Buying the NFT... Please Wait (Upto 5 mins)")
+            updateMessage("Buying the RFT... Please Wait (Upto 5 mins)")
             //run the executeSale function
             let transaction = await contract.executeSale(_tokenId, _buy, {value:salePriceInWei, gasLimit: 2000000});
             await transaction.wait();
 
-            toast.success('You successfully bought the NFT!');
+            toast.success('You successfully bought the RFT!');
             updateMessage("");
         }
         catch(e) {
@@ -49,7 +50,7 @@ export default function NFTPage (props) {
 
         if(!_supply){
             console.error("Enter a valid supply");
-            alert("Enter a valid supply");
+            toast.error("Enter a valid supply");
             return;
         }
     
@@ -68,6 +69,35 @@ export default function NFTPage (props) {
             toast.success("Token put on market successfully")
         } catch (error) {
             console.log(error)
+            toast.error("An issue occured try again")
+        }
+    }
+
+    async function updatPrice(_newPrice){
+        if(!_newPrice){
+            console.error("Enter a valid price");
+            toast.error("Enter a valid price");
+            return;
+        }
+
+        const ethers = require("ethers");
+        
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        //Pull the deployed contract instance
+        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+        try {
+
+            const newPrice = ethers.utils.parseUnits(_newPrice, 'ether');
+            
+            //put token on market
+            const data = await contract.updateTokenPrice(tokenId, newPrice);
+            await data.wait();
+            console.log("Token price updated successfully");
+            toast.success("Token price updated successfully")
+        } catch (error) {
+            console.log(error)
+            toast.error("An issue occured try again")
         }
     }
 
@@ -105,7 +135,37 @@ export default function NFTPage (props) {
                                 Description: {data1.description}
                             </div>
                             <div>
-                                Price: <span className="">{data1.price + " ETH"}</span>
+                                Price: <span className="mb-5">{data1.price + " ETH"}</span>
+                                {   currAddress === "0x2845058e29D1F7F5ec38A1DB186EF96b10bCbcCc" ?
+                                    <div className="mb-6 mt-4">
+                                        <p>Update RFT price</p>
+                                        <form>
+                                            <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="price">New Price (in ETH)</label>
+                                            <input 
+                                                className="mr-10 shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                                type="number" 
+                                                placeholder="Min 0.01 ETH" 
+                                                min={0.01} 
+                                                step="0.01" 
+                                                value={newPrice} 
+                                                onChange={e => {
+                                                    const _newPrice = parseFloat(e.target.value);
+                                                    if (!isNaN(_newPrice) && _newPrice >= 0.01) {
+                                                        setNewPrice(e.target.value)
+                                                    }
+                                                }}
+                                            />
+                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={(e) => {
+                                                e.preventDefault();
+                                                updatPrice(newPrice);
+                                            } }>
+                                                Update Price
+                                            </button>
+                                        </form>
+                                    </div> 
+                                    :
+                                    ""
+                                }
                             </div>
                             <div>
                                 Creator: <span className="text-sm">{data1.creator}</span>

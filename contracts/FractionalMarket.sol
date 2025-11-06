@@ -93,10 +93,6 @@ contract FractionalToken is ERC1155, ERC1155Holder{
         return tokensCreated[_id];
     }
 
-    function getTokensOf(address _of) public view returns (tokens[] memory){
-        return tokensOf[_of];
-    }
-
     function getHoldersWithBalances(uint256 _id) public view returns (tokenHolders[] memory){
         return holdersWithBalances[_id];
     }

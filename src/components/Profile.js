@@ -8,7 +8,7 @@ export default function Profile () {
 
     const {data, currAddress} = useContext(AppContent);
     
-    const [totalPrice, updateTotalPrice] = useState("0");
+    const [totalPrice, updateTotalPrice] = useState(0);
     const [data1, setData1] = useState([]);
     const [tokenHold, setTokenHold] = useState([]);
 
@@ -16,8 +16,9 @@ export default function Profile () {
     const tokenId = params.tokenId;
 
     useEffect(()=>{
-        let token_hold_price = 0;
-        let holdingsFor = 0;
+
+        let _totalSum = 0;
+        
         async function dataOne(){
             let theOnesFor = [];
             for(let i = 0; i < data.length; i++){
@@ -26,7 +27,14 @@ export default function Profile () {
                 }
             }
             for (let b = 0; b < theOnesFor.length; b++) {
+                let token_hold_price = 0;
+                let holdingsFor = 0;
+                let totalSum;
                 holdingsFor += Number(theOnesFor[b].has);
+                token_hold_price += Number(theOnesFor[b].price);
+                totalSum = Number(holdingsFor) * Number(token_hold_price);
+                _totalSum += totalSum
+                
             }
 
             setData1(theOnesFor);
@@ -35,14 +43,9 @@ export default function Profile () {
 
         dataOne()
         
-        let totalSum;
-        for(let j = 0; j < data1.length; j++){
-            token_hold_price += Number(data1[j].price);
-        }
-
-        totalSum = holdingsFor * token_hold_price;
+        
     
-        updateTotalPrice(totalSum.toPrecision(3));
+        updateTotalPrice(_totalSum.toPrecision(3));
         
     },[data, currAddress,])
 
