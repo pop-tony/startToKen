@@ -24,6 +24,34 @@ body {
   background-repeat: no-repeat;
 }
 
+.marquee {
+  overflow: hidden;
+}
+
+.items-wrapper {
+  display: flex;
+  animation: marquee 10s linear infinite;
+}
+
+.item {
+  flex-shrink: 0;
+  width: 200px; /* Adjust based on your item width */
+  height: 50px; /* Adjust based on your item height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* Move exactly half the width of the duplicated content */
+  }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
