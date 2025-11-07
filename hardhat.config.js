@@ -31,8 +31,8 @@ module.exports = {
       chainId: 1337
     },
     sepolia: {
-      url: "",
-      accounts: [ ""  ],
+      url: process.env.REACT_APP_ALCHEMY_SEPOLIA_URL,
+      accounts: [ process.envREACT_APP_METAMASK_PRIVATE_KEY  ],
     },
   },
   solidity: {
