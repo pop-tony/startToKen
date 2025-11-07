@@ -48,16 +48,6 @@ export default function Marketplace() {
         setSlideIndex((prevIndex) => (prevIndex + 1) % data.length);
     };
 
-    const handleAddToCart = async (productAdd)=>{
-    
-        try {
-
-        } catch (error) {
-            console.log(error.message)
-        }
-    }
-    
-
     useEffect(() => {
     const intervalId = setInterval(() => {
       setSlideIndex((prevIndex) => (prevIndex + 1) % data.length);
@@ -68,56 +58,51 @@ export default function Marketplace() {
     return (
         <div className='mt-8'>
             <main id="main-content mb-25">
-                <div className="w-fit h-fit relative flex grid grid-cols-1 md:grid-cols-1 lg:grid-cols-4">
+                <div className="w-120 h-fit flex">
 
                     {data.length ?
-                    <>
-                        <div className=''>
-                        <section id="featured-section" className="featured-section z-10 mr-30 ml-5 mb-15 w-fit h-fit rounded-xl">
-                            <h2 className="text-2xl font-bold mb-4">Featured Collections</h2>
-                            <div className="w-60 sm:w-fit h-fit relative shadow-lg shadow-gray-400 flex">
-                                <div className="card-container flex overflow-hidden">
+        
+                        <div className='flex gap-20 overflow-hidden rounded-lg grid grid-cols-1 sm:grid-cols-2'>
+                            <div className="p-4 bg-blue-400 rounded-lg">
+                                <h2 className="sm:text-2xl text-sm font-bold mb-4">Featured Collections</h2>
+                                
+                                <div className="sm:mr-8 card-container overflow-hidden">
                                     {data.length && data.map((value, index) => (
 
                                         <div key={index} className={`cardf w-100 h-100 transition duration-1000 ease-in-out ${index === slideIndex ? 'opacity-100' : 'opacity-0 hidden'}`}>
 
-                                            <div className="absolute">
-
-                                                <NFTTile data={value} key={index} ></NFTTile>
-                                                <button className="absolute cursor-pointer top-1/2 left-12 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full" onClick={prevSlide}>&#10094;</button>
-                                                <button className="absolute cursor-pointer top-1/2 right-0 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full" onClick={nextSlide}>&#10095;</button>
-                                            </div>
+                                            <NFTTile data={value} key={index} ></NFTTile>
+                                            
                                         </div>
                                     ))}
 
                                 </div>
-                                
+
+                                <div className='flex gap-5 absolute top-1/2 mb-5'>
+                                    <button className="relative ml-12 sm:ml-20 mr-7 sm:mr-20 cursor-pointer top-1/2 left-0 transform -translate-y-1/2 bg-black bg-opacity-90 text-white p-2 rounded-full" onClick={prevSlide}>&#10094;</button>
+                                    <button className="relative sm:ml-20 ml-5 cursor-pointer top-1/2 right-0 transform -translate-y-1/2 bg-black bg-opacity-90 text-white p-2 rounded-full" onClick={nextSlide}>&#10095;</button>
+                                </div>
                             </div>
 
-                        </section>
-                        </div>
-                        <div className='shadow-lg shadow-gray-400 ml-60 rounded-lg'>
-                            <h2 className="text-2xl font-bold mb-4">Top Selling</h2>
-                            <div className="w-fit shadow-lg shadow-gray-700 card-container h-90 bg-transparent flex gap-4 overflow-hidden rounded-xl">
-                            <div className="w-50 border marquee overflow-hidden">
-                                <div className="flex items-wrapper gap-3">
-                                {data.map((value, index) => (
-                                    <div
-                                        key={index}
-                                        className="card bg-white rounded-lg shadow-md transition duration-300 hover:opacity-100 hover:scale-110 hover:z-10 hover:shadow-lg shadow-gray-700"
-                                    >
-                                        <NFTTile data={value} key={index} ></NFTTile>
-
+                            <div className='ml-1 h-70 sm:h-70 sm:ml-20 bg-black bg-opacity-90 rounded-lg'>
+                                <h2 className="text-white sm:text-2xl text-sm font-bold mb-4">Top selling</h2>
+                                <div className='relative flex mt-15 marquee shadow-lg shadow-gray-400 rounded-lg overflow-hidden'>
+                                    <div className="h-30 sm:h-90 relative flex animate-marquee gap-3">
+                                        {data.map((value, index) => (
+                                            
+                                            <NFTTile data={value} key={index} ></NFTTile>
+                                            
+                                        ))}
+                                        {data.map((value, index) => (
+                                            
+                                            <NFTTile data={value} key={index} ></NFTTile>
+                                            
+                                        ))}
                                     </div>
-                                    
-
-                                ))}
                                 </div>
-                                </div>
-                            
                             </div>
                         </div>
-                    </>
+                        
                     : ""}
 
                 

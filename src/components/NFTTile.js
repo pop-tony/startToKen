@@ -22,12 +22,12 @@ function NFTTile (data, key) {
 
     return (
         <Link to={newTo}>
-        <div className="border-2 ml-12 mt-5 mb-12 flex flex-col items-center rounded-lg w-48 md:w-72 shadow-2xl"
+        <div className="sm:border-2 ml-3 sm:ml-12 mt-5 mb-12 flex flex-col items-center rounded-lg w-48 md:w-72 sm:shadow-2xl"
         onClick={()=>setSetDataId(data.data.tokenId)}>
-            <img src={IPFSUrl} alt="" className="w-72 h-80 rounded-lg object-cover" />
+            <img src={IPFSUrl} alt="" className="w-72 h-25 sm:h-80 rounded-full sm:rounded-lg object-cover" />
             <div className= "text-white w-full p-2 bg-gradient-to-t from-[#454545] to-transparent rounded-lg pt-5 -mt-20">
-                <strong className="text-xl">{data.data.name}</strong>
-                <p className="display-inline">
+                <strong className="sm:text-xl text-sm">{data.data.name}</strong>
+                <p className="text-xs display-inline">
                     {data.data.description}
                 </p>
             </div>

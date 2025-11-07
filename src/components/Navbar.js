@@ -55,29 +55,29 @@ function Navbar() {
         <li className='w-2/6'>
           <ul className='lg:flex justify-between font-bold mr-10 text-lg'>
             {location.pathname === "/" ? 
-            <li className='border-b-2 hover:pb-0 p-2'>
+            <li className='border-b-2 hover:pb-0 p-2 text-sm sm:text-lg'>
               <Link to="/">Marketplace</Link>
             </li>
             :
-            <li className='hover:border-b-2 hover:pb-0 p-2'>
+            <li className='hover:border-b-2 hover:pb-0 p-2 text-sm sm:text-lg'>
               <Link to="/">Marketplace</Link>
             </li>              
             }
             {location.pathname === "/sellNFT" ? 
-            <li className='border-b-2 hover:pb-0 p-2'>
-              <Link to="/sellNFT">List My RFT</Link>
+            <li className='border-b-2 hover:pb-0 p-2 text-xs sm:text-lg'>
+              <Link to="/sellNFT">List RFT</Link>
             </li>
             :
-            <li className='hover:border-b-2 hover:pb-0 p-2'>
-              <Link to="/sellNFT">List My RFT</Link>
+            <li className='hover:border-b-2 hover:pb-0 p-2 text-xs sm:text-lg'>
+              <Link to="/sellNFT">List RFT</Link>
             </li>              
             }              
             {location.pathname === "/profile" ? 
-            <li className='border-b-2 hover:pb-0 p-2'>
+            <li className='border-b-2 hover:pb-0 p-2 text-sm sm:text-lg'>
               <Link to="/profile">Profile</Link>
             </li>
             :
-            <li className='hover:border-b-2 hover:pb-0 p-2'>
+            <li className='hover:border-b-2 hover:pb-0 p-2 text-sm sm:text-lg'>
               <Link to="/profile">Profile</Link>
             </li>              
             }  
@@ -88,7 +88,7 @@ function Navbar() {
         </li>
         </ul>
       </nav>
-      <div className='text-white text-bold text-right mr-10 text-sm'>
+      <div className='text-white text-bold text-right sm:mr-10 text-sm ml-10 rounded-lg shadow-lg bg-black bg-opacity-70 shadow-black w-fit p-2'>
         {currAddress !== "0x" ? "Connected to":"Not Connected. Please login to view NFTs"} {currAddress !== "0x" ? (currAddress.substring(0,15)+'...'):""}
       </div>
     </div>

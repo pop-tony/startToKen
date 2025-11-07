@@ -14,6 +14,8 @@ export default function NFTPage (props) {
     const [message, updateMessage] = useState("");
     const [supply, setSupply] = useState(1);
     const [buy, setBuy] = useState(1);
+    const [trans, setTrans] = useState(0);
+    const [toAddr, setToAddr] = useState("");
     const [newPrice, setNewPrice] = useState(0);
     const [data1, setData1] = useState({})
 
@@ -46,6 +48,38 @@ export default function NFTPage (props) {
         }
     }
 
+    async function transferNFT(_trans, _toAddr, _id){
+
+        if(!_trans || !_toAddr){
+            console.error("Enter a valid data");
+            toast.error("Enter a valid data");
+            return;
+        }
+        const ethers = require("ethers");
+
+        if (!ethers.utils.isAddress(_toAddr)) {
+            console.error("Invalid recipient address provided.");
+            toast.error("Invalid recipient address. Please provide a valid Ethereum address.");
+            return;
+        }
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        //Pull the deployed contract instance
+        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+        try {
+            
+            //put token on market
+            const data = await contract.transferFraction(tokenId, _toAddr, _trans);
+            await data.wait();
+            console.log("Token successfully transfered");
+            toast.success("Token successfully transfered")
+        } catch (error) {
+            console.error(error)
+            toast.error("An issue occured try again")
+        }
+    }
+
     async function putOnmart(_supply){
 
         if(!_supply){
@@ -68,7 +102,7 @@ export default function NFTPage (props) {
             console.log("Token put on market successfully");
             toast.success("Token put on market successfully")
         } catch (error) {
-            console.log(error)
+            console.error(error)
             toast.error("An issue occured try again")
         }
     }
@@ -96,7 +130,7 @@ export default function NFTPage (props) {
             console.log("Token price updated successfully");
             toast.success("Token price updated successfully")
         } catch (error) {
-            console.log(error)
+            console.error(error)
             toast.error("An issue occured try again")
         }
     }
@@ -122,12 +156,12 @@ export default function NFTPage (props) {
     return(
         <div className="min-height-100vh">
             <ToastContainer />
-            <div className="flex ml-20 mt-20">
+            <div className="sm:ml-20 p-1 mt-20">
                 {   data1 &&
 
                     <>
-                        <img src={data1.image} alt="" className="w-2/5 rounded-lg" />
-                        <div className="text-xl ml-20 space-y-8 text-white shadow-2xl rounded-lg border-2 p-5">
+                        <img src={data1.image} alt="" className="w-22 h-1/8 sm:w-2/5 rounded-lg" />
+                        <div className="w-22 sm:w-2/5 text-sm sm:text-xl space-y-8 text-white shadow-2xl rounded-lg border-2 p-5">
                             <div>
                                 Name: {data1.name}
                             </div>
@@ -185,7 +219,7 @@ export default function NFTPage (props) {
                                         <form>
                                             <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="totalSupply">Purchase Token</label>
                                             <input
-                                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                className="shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                 type="number"
                                                 placeholder="Min 1"
                                                 min={1}
@@ -212,7 +246,7 @@ export default function NFTPage (props) {
                                             <form>
                                                 <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="totalSupply">Supply Market</label>
                                                 <input
-                                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                    className="shadow appearance-none border rounded w-20 mr-10 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                     type="number"
                                                     placeholder="Min 1"
                                                     min={1}
@@ -235,9 +269,9 @@ export default function NFTPage (props) {
                                                 </button>
                                             </form>
                                             <form>
-                                            <label className="block text-purple-500 text-sm font-bold mb-2" htmlFor="totalSupply">Purchase More</label>
+                                            <label className="block text-purple-500 text-sm font-bold mb-2 mt-8" htmlFor="totalSupply">Purchase More</label>
                                             <input
-                                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                className="shadow appearance-none border rounded w-20 mr-10 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                 type="number"
                                                 placeholder="Min 1"
                                                 min={1}
@@ -253,7 +287,41 @@ export default function NFTPage (props) {
                                                 e.preventDefault();
                                                 buyNFT(tokenId, buy);
                                             } }>
-                                                Buy this Token
+                                                Buy this RFT
+                                            </button>
+                                        </form>
+                                        <form>
+                                            <label className="block text-purple-500 text-sm font-bold mb-2 mt-8" htmlFor="totalSupply">Transfer RFT</label>
+                                            <input
+                                                className="shadow appearance-none border rounded w-20 mr-10 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                type="number"
+                                                placeholder="Min 1"
+                                                min={1}
+                                                value={trans}
+                                                onChange={e => {
+                                                    const _trans = parseFloat(e.target.value);
+                                                    if (!isNaN(_trans) && _trans >= 1) {
+                                                        setTrans(e.target.value);
+                                                    }
+                                                } } 
+
+                                            /> To: 
+                                            <input
+                                                className="shadow appearance-none border rounded w-40 mr-10 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                type="text"
+                                                placeholder="Reciepient Wallet"
+                                                value={toAddr}
+                                                onChange={e => {
+                                                    setToAddr(e.target.value);
+                                                } } 
+
+                                            />
+
+                                            <button className="enableEthereumButton bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={(e) => {
+                                                e.preventDefault();
+                                                transferNFT(tokenId,toAddr, trans);
+                                            } }>
+                                                Transfer
                                             </button>
                                         </form>
                                         </div>

@@ -24,13 +24,21 @@ body {
   background-repeat: no-repeat;
 }
 
-.marquee {
-  overflow: hidden;
+.animate-marquee {
+  animation: marquee 30s linear infinite;
 }
 
-.items-wrapper {
-  display: flex;
-  animation: marquee 10s linear infinite;
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee{
+  width: 80;
 }
 
 .item {

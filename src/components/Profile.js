@@ -53,17 +53,17 @@ export default function Profile () {
         <div className="profileClass min-height-100vh">
             <div className="profileClass">
             <div className="flex text-center flex-col mt-11 md:text-2xl text-white">
-                <div className="mb-5">
+                <div className="mb-5 rounded-lg shadow-lg bg-black bg-opacity-70 shadow-black w-fit p-2">
                     <h2 className="font-bold">Wallet Address</h2>  
                     {currAddress}
                 </div>
             </div>
             <div className="flex flex-row text-center justify-center mt-10 md:text-2xl text-white">
-                    <div>
+                    <div className='rounded-lg shadow-lg bg-black bg-opacity-70 shadow-black w-fit p-2'>
                         <h2 className="font-bold">No. of RFTs</h2>
                         {data1.length}
                     </div>
-                    <div className="ml-20">
+                    <div className="ml-20 rounded-lg shadow-lg bg-black bg-opacity-70 shadow-black w-fit p-2">
                         <h2 className="font-bold">Total Value</h2>
                         {isNaN(totalPrice) ? 0.00 : totalPrice} ETH
                     </div>
