@@ -7,7 +7,6 @@ import { useLocation } from 'react-router';
 import { AppContent } from '../contex/TokenContext';
 import Web3Modal from 'web3modal';
 import {ethers} from 'ethers';
-import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import WalletLink from 'walletlink';
 
