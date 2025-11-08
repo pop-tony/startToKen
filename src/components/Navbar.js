@@ -5,39 +5,88 @@ import {Link,} from "react-router-dom";
 import { useContext } from 'react';
 import { useLocation } from 'react-router';
 import { AppContent } from '../contex/TokenContext';
+import Web3Modal from 'web3modal';
+import {ethers} from 'ethers';
+import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import WalletLink from 'walletlink';
 
 function Navbar() {
 
   const {connected, currAddress} = useContext(AppContent);
 
   const location = useLocation();
-  
-  async function connectWebsite() {
 
-    if(connected){
-      return;
-    }
-    try {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if(chainId !== '0xaa36a7')
-      {
-        //alert('Incorrect network! Switch your metamask network to Rinkeby');
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0xaa36a7' }],
-        })
-      }  
-      await window.ethereum.request({ method: 'eth_requestAccounts' })
-        .then(() => {
-          window.location.replace(location.pathname)
-      });
-      
-    } catch (error) {
-      console.log(error)
-      toast.error("There was an issue, make sure youre loggedin")
-    }
+  const providerOptions = {
+    injected: {
+      display: {
+        name: "MetaMask",
+        description: "Connect with MetaMask",
+      },
+      package: null,
+    },
+    binancechainwallet: {
+      package: true
+    },
+    walletlink: {
+      package: WalletLink,
+      options: {
+        appName: "Tokenpop",
+        infuraId: "e82f7d943c184fda8926e7370c43b8fa",
+        darkMode: true
   
-  }
+      },
+      
+    },
+    walletconnect: {
+      package: WalletConnectProvider,
+      options: {
+        infuraId: "e82f7d943c184fda8926e7370c43b8fa",
+      },
+    },
+  };
+
+  const web3Modal = new Web3Modal({
+    cacheProvider: false,
+    theme: "dark",
+    cacheProvider: true,
+    providerOptions
+  });
+  
+  const connectWebsite = async () => {
+    if (connected) return;
+    let chainId;
+    let provider;
+    let ethersProvider;
+    
+    try {
+      console.log(web3Modal)
+      provider = await web3Modal.connect();
+      
+      ethersProvider = new ethers.providers.Web3Provider(provider);
+      chainId = await ethersProvider.getNetwork().then((network) => network.chainId);
+    
+      await ethersProvider.send('eth_requestAccounts', []);
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.error('There was an issue....try again');
+    }
+
+    if (chainId !== "0xaa36a7") {
+      try {
+        await provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0xaa36a7' }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          console.log("cannot switch at the moment...try again")
+        }
+      }
+    }
+
+  };
 
   return (
     <div className="">
