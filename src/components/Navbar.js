@@ -9,6 +9,7 @@ import Web3Modal from 'web3modal';
 import {ethers} from 'ethers';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import WalletLink from 'walletlink';
+import { BscConnector } from '@binance-chain/bsc-connector';
 
 function Navbar() {
 
@@ -25,22 +26,28 @@ function Navbar() {
       package: null,
     },
     binancechainwallet: {
-      package: true
+      package: BscConnector,
+      display: {
+        name: "Binance Wallet",
+        description: "Connect with Binance Wallet",
+      },
     },
     walletlink: {
       package: WalletLink,
       options: {
         appName: "Tokenpop",
         infuraId: "e82f7d943c184fda8926e7370c43b8fa",
-        darkMode: true
-  
+        darkMode: true,
       },
-      
     },
     walletconnect: {
       package: WalletConnectProvider,
       options: {
         infuraId: "e82f7d943c184fda8926e7370c43b8fa",
+        connector: {
+          bridge: "https://bridge.walletconnect.org",
+          qrcode: true,
+        },
       },
     },
   };
