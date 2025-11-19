@@ -71,8 +71,9 @@ export default function Profile () {
             <div className="flex flex-col text-center items-center mt-11 text-white">
                 <h2 className="font-bold">Your RFTs</h2>
                 <div className="flex justify-center flex-wrap max-w-screen-xl">
-                    {data1.map((value, index) => {
-                    return <NFTTile data={value} key={index}></NFTTile>;
+                    {data1.map((value, key) => {
+                        key = value.token_id
+                    return <NFTTile data={value} key={key}></NFTTile>;
                     })}
                 </div>
                 <div className="mt-10 text-xl">

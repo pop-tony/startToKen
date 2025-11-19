@@ -16,7 +16,7 @@ export const AppContextProvider = (props)=>{
     const [currAddress, updateAddress] = useState('0x');
     const [connected, toggleConnect] = useState(false);
     const [dataId, setDataId] = useState(0);
-
+    
     getAddress();
 
     async function getAddress() {

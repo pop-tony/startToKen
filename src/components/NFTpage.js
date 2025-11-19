@@ -23,117 +23,117 @@ export default function NFTPage (props) {
     const tokenId = params.tokenId;
 
     async function buyNFT(_tokenId, _buy) {
-        try {
-            const ethers = require("ethers");
-            //After adding your Hardhat network to your metamask, this code will get providers and signers
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-
-            //Pull the deployed contract instance
-            let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer);
-            const salePrice = ((Number(data1.price) * buy) + (Number(data1.price) * 0.05))
-            const salePriceInWei = ethers.utils.parseUnits(salePrice.toString(), 'ether')
-            console.log(salePriceInWei.toString())
-            updateMessage("Buying the RFT... Please Wait (Upto 5 mins)")
-            //run the executeSale function
-            let transaction = await contract.executeSale(_tokenId, _buy, {value:salePriceInWei, gasLimit: 2000000});
-            await transaction.wait();
-
-            toast.success('You successfully bought the RFT!');
-            updateMessage("");
-        }
-        catch(e) {
-            toast.error("There was an issue, please try again")
-            console.error("Upload Error"+e)
-        }
-    }
-
-    async function transferNFT(_trans, _toAddr, _id){
-
-        if(!_trans || !_toAddr){
-            console.error("Enter a valid data");
-            toast.error("Enter a valid data");
-            return;
-        }
-        const ethers = require("ethers");
-
-        if (!ethers.utils.isAddress(_toAddr)) {
-            console.error("Invalid recipient address provided.");
-            toast.error("Invalid recipient address. Please provide a valid Ethereum address.");
-            return;
-        }
-
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        //Pull the deployed contract instance
-        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
-        try {
-            
-            //put token on market
-            const data = await contract.transferFraction(tokenId, _toAddr, _trans);
-            await data.wait();
-            console.log("Token successfully transfered");
-            toast.success("Token successfully transfered")
-        } catch (error) {
-            console.error(error)
-            toast.error("An issue occured try again")
-        }
-    }
-
-    async function putOnmart(_supply){
-
-        if(!_supply){
-            console.error("Enter a valid supply");
-            toast.error("Enter a valid supply");
-            return;
+            try {
+                const ethers = require("ethers");
+                //After adding your Hardhat network to your metamask, this code will get providers and signers
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+    
+                //Pull the deployed contract instance
+                let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer);
+                const salePrice = ((Number(data1.price) * _buy) + (Number(data1.price) * 0.05))
+                const salePriceInWei = ethers.utils.parseUnits(salePrice.toString(), 'ether')
+                console.log(salePriceInWei.toString())
+                updateMessage("Buying the RFT... Please Wait (Upto 5 mins)")
+                //run the executeSale function
+                let transaction = await contract.executeSale(_tokenId, _buy, {value:salePriceInWei, gasLimit: 2000000});
+                await transaction.wait();
+    
+                toast.success('You successfully bought the RFT!');
+                updateMessage("");
+            }
+            catch(e) {
+                toast.error("There was an issue, please try again")
+                console.error("Error"+e)
+            }
         }
     
-        const ethers = require("ethers");
+        async function transferNFT(tokenId, _toAddr, _trans){
+    
+            if(!_trans || !_toAddr){
+                console.error("Enter a valid data");
+                toast.error("Enter a valid data");
+                return;
+            }
+            const ethers = require("ethers");
+    
+            if (!ethers.utils.isAddress(_toAddr)) {
+                console.error("Invalid recipient address provided.");
+                toast.error("Invalid recipient address. Please provide a valid Ethereum address.");
+                return;
+            }
+    
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            //Pull the deployed contract instance
+            let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+            try {
+                
+                //put token on market
+                const data = await contract.transferFraction(tokenId, _toAddr, _trans);
+                await data.wait();
+                console.log("Token successfully transfered");
+                toast.success("Token successfully transfered")
+            } catch (error) {
+                console.error(error)
+                toast.error("An issue occured try again")
+            }
+        }
+    
+        async function putOnmart(_supply){
+
+            if(!_supply){
+                console.error("Enter a valid supply");
+                toast.error("Enter a valid supply");
+                return;
+            }
         
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        //Pull the deployed contract instance
-        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
-        try {
+            const ethers = require("ethers");
             
-            //put token on market
-            const data = await contract.bringToMarket(tokenId, _supply);
-            await data.wait();
-            console.log("Token put on market successfully");
-            toast.success("Token put on market successfully")
-        } catch (error) {
-            console.error(error)
-            toast.error("An issue occured try again")
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            //Pull the deployed contract instance
+            let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+            try {
+                
+                //put token on market
+                const data = await contract.bringToMarket(tokenId, _supply);
+                await data.wait();
+                console.log("Token put on market successfully");
+                toast.success("Token put on market successfully")
+            } catch (error) {
+                console.error(error)
+                toast.error("An issue occured try again")
+            }
         }
-    }
-
-    async function updatPrice(_newPrice){
-        if(!_newPrice){
-            console.error("Enter a valid price");
-            toast.error("Enter a valid price");
-            return;
-        }
-
-        const ethers = require("ethers");
-        
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        //Pull the deployed contract instance
-        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
-        try {
-
-            const newPrice = ethers.utils.parseUnits(_newPrice, 'ether');
+    
+        async function updatPrice(_newPrice){
+            if(!_newPrice){
+                console.error("Enter a valid price");
+                toast.error("Enter a valid price");
+                return;
+            }
+    
+            const ethers = require("ethers");
             
-            //put token on market
-            const data = await contract.updateTokenPrice(tokenId, newPrice);
-            await data.wait();
-            console.log("Token price updated successfully");
-            toast.success("Token price updated successfully")
-        } catch (error) {
-            console.error(error)
-            toast.error("An issue occured try again")
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            //Pull the deployed contract instance
+            let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+            try {
+    
+                const newPrice = ethers.utils.parseUnits(_newPrice, 'ether');
+                
+                //put token on market
+                const data = await contract.updateTokenPrice(tokenId, newPrice);
+                await data.wait();
+                console.log("Token price updated successfully");
+                toast.success("Token price updated successfully")
+            } catch (error) {
+                console.error(error)
+                toast.error("An issue occured try again")
+            }
         }
-    }
 
     useEffect(()=>{
         async function dataOne(){
@@ -254,7 +254,7 @@ export default function NFTPage (props) {
                                                     onChange={e => {
                                                         const _supply = parseFloat(e.target.value);
                                                         if (!isNaN(_supply) && _supply >= 1) {
-                                                            setSupply(e.target.value);
+                                                            setSupply(_supply);
                                                         }
                                                     } } />
 

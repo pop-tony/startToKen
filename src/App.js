@@ -4,6 +4,7 @@ import Profile from './components/Profile';
 import SellNFT from './components/SellNFT';
 import NFTPage from './components/NFTpage';
 import Navbar from './components/Navbar.js';
+import Graph from './components/Graph.jsx';
 import {
   Routes,
   Route,
@@ -19,6 +20,7 @@ function App() {
           <Route path="/sellNFT" element={<SellNFT />} />
           <Route path="/nftPage/:tokenId" element={<NFTPage />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/graph" element={<Graph />} />
         </Routes>
       </div>
     </>
