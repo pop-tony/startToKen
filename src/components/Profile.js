@@ -72,7 +72,7 @@ export default function Profile () {
                 <h2 className="font-bold">Your RFTs</h2>
                 <div className="flex justify-center flex-wrap max-w-screen-xl">
                     {data1.map((value, key) => {
-                        key = value.token_id
+                        key = value.tokenId
                     return <NFTTile data={value} key={key}></NFTTile>;
                     })}
                 </div>

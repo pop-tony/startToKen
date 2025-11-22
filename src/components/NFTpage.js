@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export default function NFTPage (props) {
 
-    const {data, currAddress, dataId} = useContext(AppContent);
+    const {data, currAddress, dataId, fetchAndSaveTokenPrice} = useContext(AppContent);
 
     const [message, updateMessage] = useState("");
     const [supply, setSupply] = useState(1);
@@ -196,6 +196,17 @@ export default function NFTPage (props) {
                                                 Update Price
                                             </button>
                                         </form>
+
+                                        <p>Getand save RFT price</p>
+                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={async (e) => {
+                                            e.preventDefault();
+                                           
+                                            const priceData = await fetchAndSaveTokenPrice(tokenId)
+                                            console.log(priceData)
+                                            
+                                        } }>
+                                            GS price
+                                        </button>
                                     </div> 
                                     :
                                     ""

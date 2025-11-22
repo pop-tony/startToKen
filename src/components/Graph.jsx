@@ -2,14 +2,27 @@
 import { useParams } from 'react-router-dom';
 import { useContext, useState, useEffect } from "react";
 import { AppContent } from '../contex/TokenContext';
+import ChartJS from './Chart';
 
 export default function Profile () {
 
-    const {data} = useContext(AppContent);
+    const {data, MadeData, startChart} = useContext(AppContent);
     const [selected, setSelected] = useState({});
     const [buy, setBuy] = useState(0);
     const [sell, setSell] = useState(0);
     const [tokenId, setTokenId] = useState(0);
+    const [chartsToDisplay, setChartsToDisplay] = useState([]);
+
+    const getData = async () => {
+        const charts = [];
+        charts.push(<ChartJS key={1} value={MadeData}/>);
+        setChartsToDisplay(charts);
+    };
+
+    useEffect(() => {
+        getData();
+
+    }, []);
 
     const params = useParams();
 
@@ -30,30 +43,31 @@ export default function Profile () {
     return (
         <div>
             <div className="p-3 ml-2 mt-5 border w-fit h-fit flex gap-10 sm:gap-20">
-                <div className="border p-4">
+                <div className="border p-4 w-auto">
                     <p className="border">profit-...........</p>
                     <p className="border">loss-.............</p>
                 </div>
 
-                <div className="border">
-                    analysis................................................
+                <div className="border w-auto">
+                    ........................................................................................................................................................................................................................
+                    {chartsToDisplay}
                 </div>
 
-                <div className="border h-30">
-                    <div className="max-w-screen-xl text-center p-4 overflow-hidden">
-                        {   data.length ?
-                            data.map((value, key) => {
-                                key=value.token_id
-                                return <p className="border cursor-pointer"
-                                        onClick={()=>{
-                                            setSelected(value)
-                                            setTokenId(value.token_id)}}>
-                                    {value.name}
-                                    </p>;
-                            })
-                            :
-                            "No data available"
-                        }
+                <div className="border overflow-auto w-auto p-2" style={{ height: "12rem" }}>
+                    <div className="text-center p-4 h-100 w-full">
+                        {data.length ? (
+                        data.map(v => (
+                            <p key={v.tokenId} className="border cursor-pointer"
+                            onClick={() => {
+                                setSelected(v);
+                                setTokenId(v.tokenId);
+                                startChart(tokenId);
+                                console.log(MadeData)
+                            }}>
+                            {v.name}
+                            </p>
+                        ))
+                        ) : "No data available"}
                     </div>
                 </div>
                 
@@ -78,7 +92,6 @@ export default function Profile () {
 
                     <button className="enableEthereumButton bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={(e) => {
                         e.preventDefault();
-                        console.log(buy)
                         buyRFT(tokenId, buy);
                     } }>
                         Buy
@@ -103,7 +116,7 @@ export default function Profile () {
 
                     <button
                         className="enableEthereumButton bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                             e.preventDefault();
                             sellRFT(tokenId, sell);
                         } }
