@@ -6,7 +6,6 @@ import { useLocation } from 'react-router';
 import { ToastContainer, toast } from 'react-toastify';
 import Mdata from "../components/Data.js"
 import 'react-toastify/dist/ReactToastify.css';
-const moment = require('moment');
 
 export const AppContent = createContext()
 
@@ -153,7 +152,7 @@ export const AppContextProvider = (props)=>{
     //User calls to set data for selected token and create graph
     const getPriceData = async (_tokenId)=>{
         try {
-            const {data} = await axios.get(backendUrl + '/api/price/data', {_tokenId})
+            const {data} = await axios.get(backendUrl + '/api/price/data', {params: { _tokenId: _tokenId }})
             if(data.success){ 
                 return data.prices
             }else{
@@ -170,6 +169,7 @@ export const AppContextProvider = (props)=>{
 
     function aggregatePriceData(prices, interval) {
         const aggregatedPrices = {};
+    
         prices.forEach((price) => {
             const timestamp = new Date(price.date).getTime();
             const intervalStart = Math.floor(timestamp / interval) * interval;
@@ -200,12 +200,13 @@ export const AppContextProvider = (props)=>{
         try {
             const pric = [];
             const prices = await getPriceData(_cid);
-            if(prices){
+            if(prices.length){
                 for(let i=0; i < prices.length-1; i++){
-                let { price, date } = prices[i];
-                let pricess = { date: new Date(date).toDateString(), price };
-                pric.push(pricess);
-            }
+                    let { price, date } = prices[i];
+                    let pricess = { date: new Date(date).toDateString(), price };
+                    pric.push(pricess);
+                    
+                }
             }
             
             const interval = 2 * 60 * 1000; // 2 minutes

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useContext, useState, useEffect } from "react";
 import { AppContent } from '../contex/TokenContext';
 import ChartJS from './Chart';
+import { RealTimeChart } from './RealTimeChart';
 
 export default function Profile () {
 
@@ -13,14 +14,8 @@ export default function Profile () {
     const [tokenId, setTokenId] = useState(0);
     const [chartsToDisplay, setChartsToDisplay] = useState([]);
 
-    const getData = async () => {
-        const charts = [];
-        charts.push(<ChartJS key={1} value={MadeData}/>);
-        setChartsToDisplay(charts);
-    };
 
     useEffect(() => {
-        getData();
 
     }, []);
 
@@ -49,8 +44,7 @@ export default function Profile () {
                 </div>
 
                 <div className="border w-auto">
-                    ........................................................................................................................................................................................................................
-                    {chartsToDisplay}
+                    <RealTimeChart mdata={MadeData} key={MadeData.length} />
                 </div>
 
                 <div className="border overflow-auto w-auto p-2" style={{ height: "12rem" }}>
@@ -58,10 +52,10 @@ export default function Profile () {
                         {data.length ? (
                         data.map(v => (
                             <p key={v.tokenId} className="border cursor-pointer"
-                            onClick={() => {
+                            onClick={async () => {
                                 setSelected(v);
                                 setTokenId(v.tokenId);
-                                startChart(tokenId);
+                                await startChart(v.tokenId);
                                 console.log(MadeData)
                             }}>
                             {v.name}
